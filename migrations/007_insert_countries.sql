@@ -1,0 +1,1 @@
+INSERT INTO country (id, country_name) VALUES ('825eef0e-ae61-4b53-a185-be8f78b9f119', 'United Kingdom'), ('bd488664-2c29-4df8-a78b-6e502f5bcb8f', 'Canada'), ('acbb479e-846b-407a-bb0a-ce925406a2d5', 'Australia');
