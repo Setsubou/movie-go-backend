@@ -1,7 +1,10 @@
 package repository
 
-import "backend/model"
+import (
+	db "backend/db/sqlc"
+)
 
 type MovieRepository interface {
-	GetById(id int) (*model.Movie, error)
+	GetMovieById(id string) (*db.GetMovieByIdRow, error)
+	GetGenreByMovieId(id string) (*[]db.GetGenresByMovieIdRow, error)
 }

@@ -4,7 +4,6 @@ import (
 	"backend/repository"
 	"backend/services"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -19,17 +18,8 @@ func NewMovieController(repository repository.MovieRepository) *Movie_controller
 	}
 }
 
-func (mc *Movie_controller) GetMovieById(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
-
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "Invalid id",
-		})
-		return
-	}
-	
-	movie := movie_service.NewMovieService(mc.repository).GetById(id)
+func (mc *Movie_controller) GetMovieById(c *gin.Context) {	
+	movie := movie_service.NewMovieService(mc.repository).GetById(c.Param("id"))
 
 	c.JSON(http.StatusOK, movie)
 }
