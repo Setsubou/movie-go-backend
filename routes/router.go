@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"backend/db"
 	"backend/routes/api"
 
 	"github.com/gin-gonic/gin"
@@ -15,7 +16,8 @@ func InitRouter() *gin.Engine {
 		})
 	})
 
-	router.GET("movie/:id", api.GetMovie)
+	movie_controller := api.NewMovieController(db.NewMockDb())
+	router.GET("movie/:id", movie_controller.GetMovieById)
 
 	return router
 }
