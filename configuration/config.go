@@ -11,6 +11,7 @@ type ApplicationConfiguration struct{
 	port string
 	host string
 	Release_mode string
+	Secret string
 }
 
 func (a *ApplicationConfiguration) GetApplicationConnectionString() string {
@@ -54,6 +55,7 @@ func InitConfiguration() *Configuration {
 			port: config["APP_PORT"],
 			host: config["APP_HOST"],
 			Release_mode: config["RELEASE_MODE"],
+			Secret: config["JWT_SECRET_KEY"],
 		},
 		DatabaseConfiguration:    DatabaseConfiguration{
 			username:      config["DB_USERNAME"],

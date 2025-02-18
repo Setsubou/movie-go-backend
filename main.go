@@ -10,17 +10,16 @@ import (
 )
 
 func main() {
-	configuration := configuration.InitConfiguration()
+	config := configuration.InitConfiguration()
 
-	gin.SetMode(configuration.ApplicationConfiguration.Release_mode)
-	router := routes.InitRouter(configuration.DatabaseConfiguration.GetDatabaseConnectionString())
+	gin.SetMode(config.ApplicationConfiguration.Release_mode)
+	router := routes.InitRouter(config)
 
 	server := &http.Server{
-		Addr:    configuration.ApplicationConfiguration.GetApplicationConnectionString(),
+		Addr:    config.ApplicationConfiguration.GetApplicationConnectionString(),
 		Handler: router,
 	}
 
-	fmt.Printf("Listening at %s", server.Addr)
-
+	fmt.Printf("\n listening at %s \n", server.Addr)
 	server.ListenAndServe()
 }
