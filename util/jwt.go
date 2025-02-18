@@ -8,13 +8,13 @@ import (
 	"github.com/google/uuid"
 )
 
-func IsJWTValid(tokenInput string) error {
+func IsJWTValid(tokenInput string, secret string) error {
 	token, err := jwt.Parse(tokenInput, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.ErrBadRequest.SetMessage("unrecognized token")
 		}
 
-		return []byte("m3a7QDs8+ZCqLJvLOh/mfAiwX1MqUzWQbdHEZ6i5Tq8="), nil //TODO this returns secret key, move it to env var later
+		return []byte(secret), nil
 	})
 
 	if err != nil {

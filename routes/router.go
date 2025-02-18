@@ -33,7 +33,7 @@ func InitRouter(config *configuration.Configuration) *gin.Engine {
 	router.POST("/auth/", auth_controller.VerifyUserLogin)
 
 	apiv1 := router.Group("/api/v1")
-	apiv1.Use(jwt.JWT()) 
+	apiv1.Use(jwt.JWT(config.ApplicationConfiguration.Secret)) 
 	
 	movie_controller := api.NewMovieController(postgres)
 	apiv1.GET("/movie/:id", movie_controller.GetMovieById)

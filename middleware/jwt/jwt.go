@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func JWT() gin.HandlerFunc {
+func JWT(secret string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 		authToken := strings.TrimPrefix(authHeader, "Bearer ")
@@ -23,7 +23,7 @@ func JWT() gin.HandlerFunc {
 			return
 		}
 
-		err := util.IsJWTValid(authToken)
+		err := util.IsJWTValid(authToken, secret)
 
 		if err != nil {
 			if internalErr, ok := err.(*errors.InternalError); ok {
