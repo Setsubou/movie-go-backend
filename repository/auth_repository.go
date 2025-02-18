@@ -1,5 +1,5 @@
 package repository
 
 type AuthRepository interface {
-	GetOneUserByUsernameAndPasswordHash(username string) string
+	GetOneUserByUsername(username string) string
 }

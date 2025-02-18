@@ -2,6 +2,7 @@ package jwt
 
 import (
 	"backend/util"
+	"backend/errors"
 	"net/http"
 	"strings"
 
@@ -13,7 +14,7 @@ func JWT() gin.HandlerFunc {
 		authHeader := c.GetHeader("Authorization")
 		authToken := strings.TrimPrefix(authHeader, "Bearer ")
 
-		if authToken == "" { //TODO check if token is valid and check if token has expired or not
+		if authToken == "" {
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"message": "missing bearer token.",
 			})
@@ -22,11 +23,14 @@ func JWT() gin.HandlerFunc {
 			return
 		}
 
-		valid, err := util.IsJWTValid(authToken)
-		if !valid || err != nil {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"message": err,
-			})
+		err := util.IsJWTValid(authToken)
+
+		if err != nil {
+			if internalErr, ok := err.(*errors.InternalError); ok {
+				c.JSON(internalErr.Code, gin.H{"error": internalErr.Message})
+			} else {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+			}
 
 			c.Abort()
 			return

@@ -12,9 +12,9 @@ type Genre struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 }
 
-func ConvertGenreFromRepository(g db.Genre) (Genre, error) {
-	return Genre {
-		Id: g.ID.String(),
+func ConvertGenreFromDTO(g db.Genre) Genre {
+	return Genre{
+		Id:    g.ID.String(),
 		Genre: g.Genre,
-	}, nil
+	}
 }

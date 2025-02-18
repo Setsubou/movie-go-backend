@@ -18,7 +18,7 @@ type Movie struct {
 	UpdatedAt   time.Time `json:"updated_at,omitempty"`
 }
 
-func ConvertMovieFromRepository(m db.Movie) (Movie, error) {
+func ConvertMovieFromDTO(m db.Movie) Movie {
 	score, _ := m.Score.Float64Value()
 
 	return Movie{
@@ -28,5 +28,5 @@ func ConvertMovieFromRepository(m db.Movie) (Movie, error) {
 		Picture:     m.Picture,
 		ReleaseDate: m.ReleaseDate.Time,
 		Synopsis:    m.Synopsis,
-	}, nil
+	}
 }

@@ -14,10 +14,10 @@ type Publisher struct {
 	UpdatedAt      time.Time `json:"updated_at,omitempty"`
 }
 
-func ConvertPublisherFromRepository(p db.Publisher) (Publisher, error) {
+func ConvertPublisherFromDTO(p db.Publisher) Publisher {
 	return Publisher{
-		Id: p.ID.String(),
+		Id:             p.ID.String(),
 		Publisher_name: p.PublisherName,
-		Year_Founded: int(p.YearFounded),
-	}, nil
+		Year_Founded:   int(p.YearFounded),
+	}
 }

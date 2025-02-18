@@ -1,29 +1,27 @@
 package routes
 
 import (
+	"backend/configuration"
 	db "backend/db/postgres_db"
 	"backend/middleware/jwt"
-	"context"
-	"fmt"
-	"os"
-
 	"backend/routes/api"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func InitRouter(database_connection_url string) *gin.Engine { //TODO make it so this accept config instead of db connection, more flexible
-	// I also need to pass config to auth so it can access env key later
-	dbpool, err := pgxpool.New(context.Background(), database_connection_url)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Unable to create connection pool: %v\n", err)
-		os.Exit(1)
-	}
-	
+func InitRouter(config *configuration.Configuration) *gin.Engine {
 	router := gin.New()
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
+	router.Use(cors.New(cors.Config{
+		AllowAllOrigins: true,
+		AllowMethods: []string{"PUT", "GET", "POST", "OPTIONS"},
+		AllowHeaders: []string{"Content-Type", "Content-Length", "Accept-Encoding", "X-CSRF-Token", "Authorization", "accept", "origin"},
+		AllowCredentials: true,
+	}))
+
+	postgres := db.NewPostgresDb(config.DatabaseConfiguration.GetDatabaseConnectionString())
 
 	router.GET("/health-check/", func(context *gin.Context) {
 		context.JSON(200, gin.H{
@@ -31,13 +29,13 @@ func InitRouter(database_connection_url string) *gin.Engine { //TODO make it so 
 		})
 	})
 
-	auth_controller := api.NewAuthController(db.NewPostgresDb(dbpool))
+	auth_controller := api.NewAuthController(postgres, config.ApplicationConfiguration.Secret)
 	router.POST("/auth/", auth_controller.VerifyUserLogin)
 
 	apiv1 := router.Group("/api/v1")
 	apiv1.Use(jwt.JWT()) 
 	
-	movie_controller := api.NewMovieController(db.NewPostgresDb(dbpool))
+	movie_controller := api.NewMovieController(postgres)
 	apiv1.GET("/movie/:id", movie_controller.GetMovieById)
 	apiv1.GET("/movies/", movie_controller.GetListAllMovies)
 

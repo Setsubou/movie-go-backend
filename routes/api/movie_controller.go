@@ -2,6 +2,7 @@ package api
 
 import (
 	"backend/repository"
+	"backend/errors"
 	"backend/services"
 	"net/http"
 
@@ -19,7 +20,16 @@ type Movie_controller struct {
 }
 
 func (mc *Movie_controller) GetMovieById(c *gin.Context) {
-	movie := services.NewMovieService(mc.repository).GetMovieById(c.Param("id"))
+	movie, err := services.NewMovieService(mc.repository).GetMovieById(c.Param("id"))
+
+	if err != nil {
+		if internalErr, ok := err.(*errors.InternalError); ok {
+            c.JSON(internalErr.Code, gin.H{"error": internalErr.Message})
+        } else {
+            c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+        }
+        return
+	}
 
 	c.JSON(http.StatusOK, movie)
 }

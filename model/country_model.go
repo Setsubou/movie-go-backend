@@ -7,9 +7,9 @@ type Country struct {
 	Country_name string `json:"country_name,omitempty"`
 }
 
-func ConvertCountryFromRepository(c db.Country) (Country, error) {
+func ConvertCountryFromDTO(c db.Country) Country {
 	return Country{
-		Id: c.ID.String(),
+		Id:           c.ID.String(),
 		Country_name: c.CountryName,
-	}, nil
+	}
 }

@@ -2,8 +2,11 @@ package db
 
 import (
 	"backend/db/sqlc"
+	"backend/errors"
 	"context"
 	"fmt"
+	"os"
+
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -12,14 +15,21 @@ type Postgres_db struct {
 	pgx_pool *pgxpool.Pool
 }
 
-func NewPostgresDb(pgx_pool *pgxpool.Pool) *Postgres_db {
+func NewPostgresDb(connection_string string) *Postgres_db {
+	pgx_pool, err := pgxpool.New(context.Background(), connection_string)
+
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Unable to create connection pool: %v\n", err)
+		os.Exit(1)
+	}
+
 	return &Postgres_db{
 		pgx_pool: pgx_pool,
 	}
 }
 
 // Implements Auth Repository
-func (p *Postgres_db) GetOneUserByUsernameAndPasswordHash(username string) string {
+func (p *Postgres_db) GetOneUserByUsername(username string) string {
 	ctx := context.Background()
 	query := db.New(p.pgx_pool)
 
@@ -30,46 +40,27 @@ func (p *Postgres_db) GetOneUserByUsernameAndPasswordHash(username string) strin
 
 
 // Implements Movie Repository
-func (p *Postgres_db) GetMovieById(id string) (*db.GetMovieByIdRow, error) {
+func (p *Postgres_db) GetMovieById(uuid pgtype.UUID) (*db.GetMovieByIdRow, error) {
 	ctx := context.Background()
-
 	query := db.New(p.pgx_pool)
 
-	var UUID pgtype.UUID
-	err := UUID.Scan(id)
+	movie, err := query.GetMovieById(ctx, uuid)
 
 	if err != nil {
-		fmt.Println("Invalid UUID")
-		return nil, err
-	}
-
-	movie, err := query.GetMovieById(ctx, UUID)
-
-	if err != nil {
-		return nil, err
+		return nil, errors.ErrNotFound
 	}
 
 	return &movie, nil
 }
 
-func (p *Postgres_db) GetGenreByMovieId(id string) (*[]db.GetGenresByMovieIdRow, error) {
+func (p *Postgres_db) GetGenreByMovieId(uuid pgtype.UUID) (*[]db.GetGenresByMovieIdRow, error) {
 	ctx := context.Background()
-
 	query := db.New(p.pgx_pool)
 
-	var UUID pgtype.UUID
-	err := UUID.Scan(id)
+	movie_genre, err := query.GetGenresByMovieId(ctx, uuid)
 
 	if err != nil {
-		fmt.Println("Invalid UUID")
-		return nil, err
-	}
-
-	movie_genre, err := query.GetGenresByMovieId(ctx, UUID)
-
-	if err != nil {
-		fmt.Println("Error when fetching Genre by Movie ID")
-		return nil, err
+		return nil, errors.ErrNotFound
 	}
 
 	return &movie_genre, nil
@@ -79,7 +70,11 @@ func (p *Postgres_db) GetAllMovies() (*[]db.GetAllMoviesRow, error) {
 	ctx := context.Background()
 	query := db.New(p.pgx_pool)
 
-	movies, _ := query.GetAllMovies(ctx)
+	movies, err := query.GetAllMovies(ctx)
+	
+	if err != nil {
+		return nil, errors.ErrNotFound
+	}
 
 	return &movies, nil
 }
