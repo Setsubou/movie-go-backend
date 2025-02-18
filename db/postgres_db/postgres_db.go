@@ -8,7 +8,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-type Postgres_db struct{
+type Postgres_db struct {
 	pgx_pool *pgxpool.Pool
 }
 
@@ -18,6 +18,18 @@ func NewPostgresDb(pgx_pool *pgxpool.Pool) *Postgres_db {
 	}
 }
 
+// Implements Auth Repository
+func (p *Postgres_db) GetOneUserByUsernameAndPasswordHash(username string) string {
+	ctx := context.Background()
+	query := db.New(p.pgx_pool)
+
+	count, _ := query.CheckUserCredentials(ctx, username)
+
+	return count
+}
+
+
+// Implements Movie Repository
 func (p *Postgres_db) GetMovieById(id string) (*db.GetMovieByIdRow, error) {
 	ctx := context.Background()
 
@@ -61,4 +73,13 @@ func (p *Postgres_db) GetGenreByMovieId(id string) (*[]db.GetGenresByMovieIdRow,
 	}
 
 	return &movie_genre, nil
+}
+
+func (p *Postgres_db) GetAllMovies() (*[]db.GetAllMoviesRow, error) {
+	ctx := context.Background()
+	query := db.New(p.pgx_pool)
+
+	movies, _ := query.GetAllMovies(ctx)
+
+	return &movies, nil
 }

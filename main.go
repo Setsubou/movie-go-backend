@@ -1,6 +1,7 @@
 package main
 
 import (
+	"backend/configuration"
 	"backend/routes"
 	"fmt"
 	"net/http"
@@ -9,12 +10,13 @@ import (
 )
 
 func main() {
-	gin.SetMode("debug") //TODO change this to env file later
+	configuration := configuration.InitConfiguration()
 
-	router := routes.InitRouter()
+	gin.SetMode(configuration.ApplicationConfiguration.Release_mode)
+	router := routes.InitRouter(configuration.DatabaseConfiguration.GetDatabaseConnectionString())
 
 	server := &http.Server{
-		Addr:    ":8080",
+		Addr:    configuration.ApplicationConfiguration.GetApplicationConnectionString(),
 		Handler: router,
 	}
 

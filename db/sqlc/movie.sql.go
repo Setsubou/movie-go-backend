@@ -11,6 +11,53 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const getAllMovies = `-- name: GetAllMovies :many
+SELECT m.id, m.title, m.score, m.picture, m.release_date, m.synopsis, m.publisher_id, m.created_at, m.updated_at, p.id, p.publisher_name, p.year_founded, p.country_id, p.created_at, p.updated_at
+FROM movies m
+LEFT JOIN publisher p ON m.publisher_id = p.id
+`
+
+type GetAllMoviesRow struct {
+	Movie     Movie
+	Publisher Publisher
+}
+
+func (q *Queries) GetAllMovies(ctx context.Context) ([]GetAllMoviesRow, error) {
+	rows, err := q.db.Query(ctx, getAllMovies)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetAllMoviesRow
+	for rows.Next() {
+		var i GetAllMoviesRow
+		if err := rows.Scan(
+			&i.Movie.ID,
+			&i.Movie.Title,
+			&i.Movie.Score,
+			&i.Movie.Picture,
+			&i.Movie.ReleaseDate,
+			&i.Movie.Synopsis,
+			&i.Movie.PublisherID,
+			&i.Movie.CreatedAt,
+			&i.Movie.UpdatedAt,
+			&i.Publisher.ID,
+			&i.Publisher.PublisherName,
+			&i.Publisher.YearFounded,
+			&i.Publisher.CountryID,
+			&i.Publisher.CreatedAt,
+			&i.Publisher.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getGenresByMovieId = `-- name: GetGenresByMovieId :many
 SELECT g.id, g.genre, g.created_at, g.updated_at
 FROM movies m

@@ -2,32 +2,26 @@ package model
 
 import (
 	db "backend/db/sqlc"
-	"fmt"
 	"time"
 )
 
 type Movie struct {
-	Id          string    `json:"id"`
-	Title       string    `json:"title"`
-	Score       float64   `json:"score"`
-	Picture     string    `json:"picture"`
-	ReleaseDate time.Time `json:"release_date"`
-	Synopsis    string    `json:"synopsis"`
-	Publisher   Publisher `json:"publisher"`
-	Genre       []Genre   `json:"genre"`
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
+	Id          string    `json:"id,omitempty"`
+	Title       string    `json:"title,omitempty"`
+	Score       float64   `json:"score,omitempty"`
+	Picture     string    `json:"picture,omitempty"`
+	ReleaseDate time.Time `json:"release_date,omitempty"`
+	Synopsis    string    `json:"synopsis,omitempty"`
+	Publisher   Publisher `json:"publisher,omitempty"`
+	Genre       []Genre   `json:"genre,omitempty"`
+	CreatedAt   time.Time `json:"created_at,omitempty"`
+	UpdatedAt   time.Time `json:"updated_at,omitempty"`
 }
 
-func ConvertMovieFromRepository(m db.Movie) (*Movie, error) {
-	score, err := m.Score.Float64Value()
+func ConvertMovieFromRepository(m db.Movie) (Movie, error) {
+	score, _ := m.Score.Float64Value()
 
-	if err != nil {
-		fmt.Println("Unable to convert to float")
-		return nil, err
-	}
-
-	return &Movie{
+	return Movie{
 		Id:          m.ID.String(),
 		Title:       m.Title,
 		Score:       score.Float64,
