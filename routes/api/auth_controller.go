@@ -43,6 +43,14 @@ func (ac *Auth_controller) VerifyUserLogin(c *gin.Context) {
 
 	c.SetSameSite(http.SameSiteLaxMode)
 	c.JSON(http.StatusOK, gin.H{
-		"token": token,
-	}) //Temp status for now, Use cookies instead
+		"access token": token,
+	})
+}
+
+func (ac *Auth_controller) VerifyToken(c* gin.Context) {
+	// Verification already happened in JWT middleware, if token is valid this function is run
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "token is still valid",
+	})
 }
