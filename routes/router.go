@@ -53,5 +53,9 @@ func InitRouter(config *configuration.Configuration) *gin.Engine {
 	publisher_controller := api.NewPublisherController(postgres)
 	apiv1.GET("/publishers/name/", publisher_controller.GetListAllPublishersName)
 
+	// Genre endpoints
+	genre_controller := api.NewGenreController(postgres)
+	apiv1.GET("/genres/", genre_controller.GetAllGenres)
+
 	return router
 }

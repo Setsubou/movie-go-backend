@@ -8,12 +8,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func NewAuthService(repository repository.AuthRepository) *AuthService {
-	return &AuthService{
-		repository: repository,
-	}
-}
-
 type AuthService struct {
 	repository repository.AuthRepository
 }
@@ -33,5 +27,10 @@ func (s *AuthService) VerifyUserLogin(username string, password string, secret s
 	}
 
 	return token, nil
+}
 
+func NewAuthService(repository repository.AuthRepository) *AuthService {
+	return &AuthService{
+		repository: repository,
+	}
 }

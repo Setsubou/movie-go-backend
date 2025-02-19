@@ -140,3 +140,17 @@ func (p *Postgres_db) GetListAllPublishersName() (*[]db.GetAllPublishersNameRow,
 
 	return &publishers, nil
 }
+
+// implements Genre Repository
+func (p *Postgres_db) GetAllGenres() (*[]db.GetAllGenresRow, error) {
+	ctx := context.Background()
+	query := db.New(p.pgx_pool)
+
+	genres, err := query.GetAllGenres(ctx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &genres, nil
+}
