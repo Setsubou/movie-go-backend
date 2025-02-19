@@ -11,6 +11,17 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const deleteMovieById = `-- name: DeleteMovieById :exec
+DELETE
+FROM movies m
+WHERE m.id = $1
+`
+
+func (q *Queries) DeleteMovieById(ctx context.Context, id pgtype.UUID) error {
+	_, err := q.db.Exec(ctx, deleteMovieById, id)
+	return err
+}
+
 const getAllMovies = `-- name: GetAllMovies :many
 SELECT m.id, m.title, m.score, m.picture, m.release_date, m.synopsis, m.publisher_id, m.created_at, m.updated_at, p.id, p.publisher_name, p.year_founded, p.country_id, p.created_at, p.updated_at
 FROM movies m
@@ -132,4 +143,95 @@ func (q *Queries) GetMovieById(ctx context.Context, id pgtype.UUID) (GetMovieByI
 		&i.Country.CountryName,
 	)
 	return i, err
+}
+
+const getMoviesByPublisherId = `-- name: GetMoviesByPublisherId :many
+SELECT m.id, m.title, m.score, m.picture, m.release_date, m.synopsis, m.publisher_id, m.created_at, m.updated_at, p.id, p.publisher_name, p.year_founded, p.country_id, p.created_at, p.updated_at
+FROM movies m
+LEFT JOIN publisher p ON m.publisher_id = p.id
+WHERE p.id = $1
+`
+
+type GetMoviesByPublisherIdRow struct {
+	Movie     Movie
+	Publisher Publisher
+}
+
+func (q *Queries) GetMoviesByPublisherId(ctx context.Context, id pgtype.UUID) ([]GetMoviesByPublisherIdRow, error) {
+	rows, err := q.db.Query(ctx, getMoviesByPublisherId, id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetMoviesByPublisherIdRow
+	for rows.Next() {
+		var i GetMoviesByPublisherIdRow
+		if err := rows.Scan(
+			&i.Movie.ID,
+			&i.Movie.Title,
+			&i.Movie.Score,
+			&i.Movie.Picture,
+			&i.Movie.ReleaseDate,
+			&i.Movie.Synopsis,
+			&i.Movie.PublisherID,
+			&i.Movie.CreatedAt,
+			&i.Movie.UpdatedAt,
+			&i.Publisher.ID,
+			&i.Publisher.PublisherName,
+			&i.Publisher.YearFounded,
+			&i.Publisher.CountryID,
+			&i.Publisher.CreatedAt,
+			&i.Publisher.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const insertNewMovie = `-- name: InsertNewMovie :exec
+INSERT INTO movies (id, title, score, picture, release_date, synopsis, publisher_id)
+VALUES($1, $2, $3, $4, $5, $6, $7)
+`
+
+type InsertNewMovieParams struct {
+	ID          pgtype.UUID
+	Title       string
+	Score       pgtype.Numeric
+	Picture     string
+	ReleaseDate pgtype.Date
+	Synopsis    string
+	PublisherID pgtype.UUID
+}
+
+func (q *Queries) InsertNewMovie(ctx context.Context, arg InsertNewMovieParams) error {
+	_, err := q.db.Exec(ctx, insertNewMovie,
+		arg.ID,
+		arg.Title,
+		arg.Score,
+		arg.Picture,
+		arg.ReleaseDate,
+		arg.Synopsis,
+		arg.PublisherID,
+	)
+	return err
+}
+
+const insertNewMovieGenre = `-- name: InsertNewMovieGenre :exec
+INSERT INTO movie_genres (movie_id, genre_id)
+VALUES ($1, $2)
+`
+
+type InsertNewMovieGenreParams struct {
+	MovieID pgtype.UUID
+	GenreID pgtype.UUID
+}
+
+func (q *Queries) InsertNewMovieGenre(ctx context.Context, arg InsertNewMovieGenreParams) error {
+	_, err := q.db.Exec(ctx, insertNewMovieGenre, arg.MovieID, arg.GenreID)
+	return err
 }
