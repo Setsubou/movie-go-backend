@@ -3,23 +3,22 @@ package api
 import (
 	"backend/errors"
 	"backend/model"
-	"backend/repository"
 	"backend/services"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
-func NewAuthController(repository repository.AuthRepository, secret string) *Auth_controller {
+func NewAuthController(auth_service *services.AuthService, secret string) *Auth_controller {
 	return &Auth_controller{
-		repository: repository,
-		secret: secret,
+		auth_service: auth_service,
+		secret:  secret,
 	}
 }
 
 type Auth_controller struct {
-	repository repository.AuthRepository
-	secret string
+	auth_service *services.AuthService
+	secret  string
 }
 
 func (ac *Auth_controller) VerifyUserLogin(c *gin.Context) {
@@ -30,15 +29,15 @@ func (ac *Auth_controller) VerifyUserLogin(c *gin.Context) {
 		return
 	}
 
-	token, err := services.NewAuthService(ac.repository).VerifyUserLogin(login_credentials.Username, login_credentials.Password, ac.secret)
-	
+	token, err := ac.auth_service.VerifyUserLogin(login_credentials.Username, login_credentials.Password, ac.secret)
+
 	if err != nil {
 		if internalErr, ok := err.(*errors.InternalError); ok {
-            c.JSON(internalErr.Code, gin.H{"error": internalErr.Message})
-        } else {
-            c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
-        }
-        return
+			c.JSON(internalErr.Code, gin.H{"error": internalErr.Message})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		}
+		return
 	}
 
 	c.SetSameSite(http.SameSiteLaxMode)
@@ -47,7 +46,7 @@ func (ac *Auth_controller) VerifyUserLogin(c *gin.Context) {
 	})
 }
 
-func (ac *Auth_controller) VerifyToken(c* gin.Context) {
+func (ac *Auth_controller) VerifyToken(c *gin.Context) {
 	// Verification already happened in JWT middleware, if token is valid this function is run
 
 	c.JSON(http.StatusOK, gin.H{

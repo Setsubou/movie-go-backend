@@ -2,19 +2,24 @@ package api
 
 import (
 	"backend/errors"
-	"backend/repository"
 	"backend/services"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
+func NewPublisherController(publisher_service *services.PublisherService) *Publisher_controller {
+	return &Publisher_controller{
+		publisher_service: publisher_service,
+	}
+}
+
 type Publisher_controller struct {
-	repository repository.PublisherRepository
+	publisher_service *services.PublisherService
 }
 
 func (pc *Publisher_controller) GetListAllPublishersName(c *gin.Context) {
-	publisher, err := services.NewPublisherService(pc.repository).GetListAllPublishers()
+	publisher, err := pc.publisher_service.GetListAllPublishers()
 
 	if err != nil {
 		if internalErr, ok := err.(*errors.InternalError); ok {
@@ -26,10 +31,4 @@ func (pc *Publisher_controller) GetListAllPublishersName(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, publisher)
-}
-
-func NewPublisherController(repository repository.PublisherRepository) *Publisher_controller {
-	return &Publisher_controller{
-		repository: repository,
-	}
 }

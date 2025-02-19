@@ -1,5 +1,5 @@
 package repository
 
-type AuthRepository interface {
+type AuthService interface {
 	GetOneUserByUsername(username string) string
 }

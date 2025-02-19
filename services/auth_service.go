@@ -1,15 +1,15 @@
 package services
 
 import (
+	"backend/errors"
 	"backend/repository"
 	"backend/util"
-	"backend/errors"
 
 	"golang.org/x/crypto/bcrypt"
 )
 
 type AuthService struct {
-	repository repository.AuthRepository
+	repository repository.AuthService
 }
 
 func (s *AuthService) VerifyUserLogin(username string, password string, secret string) (string, error) {
@@ -29,7 +29,7 @@ func (s *AuthService) VerifyUserLogin(username string, password string, secret s
 	return token, nil
 }
 
-func NewAuthService(repository repository.AuthRepository) *AuthService {
+func NewAuthService(repository repository.AuthService) *AuthService {
 	return &AuthService{
 		repository: repository,
 	}

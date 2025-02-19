@@ -2,19 +2,24 @@ package api
 
 import (
 	"backend/errors"
-	"backend/repository"
 	"backend/services"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
+func NewGenreController(genre_service *services.GenreService) *Genre_controller {
+	return &Genre_controller{
+		genre_service: genre_service,
+	}
+}
+
 type Genre_controller struct {
-	repository repository.GenreRepository
+	genre_service *services.GenreService
 }
 
 func (gc *Genre_controller) GetAllGenres(c *gin.Context) {
-	genres, err := services.NewGenreService(gc.repository).GetAllGenres()
+	genres, err := gc.genre_service.GetAllGenres()
 
 	if err != nil {
 		if internalErr, ok := err.(*errors.InternalError); ok {
@@ -26,10 +31,4 @@ func (gc *Genre_controller) GetAllGenres(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, genres)
-}
-
-func NewGenreController(repository repository.GenreRepository) *Genre_controller {
-	return &Genre_controller{
-		repository: repository,
-	}
 }

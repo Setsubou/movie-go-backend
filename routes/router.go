@@ -5,6 +5,7 @@ import (
 	db "backend/db/postgres_db"
 	"backend/middleware/jwt"
 	"backend/routes/api"
+	"backend/services"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -32,7 +33,9 @@ func InitRouter(config *configuration.Configuration) *gin.Engine {
 	})
 
 	// Auth endpoints
-	auth_controller := api.NewAuthController(postgres, jwt_secret)
+	auth_service := services.NewAuthService(postgres)
+	auth_controller := api.NewAuthController(auth_service, jwt_secret)
+
 	router.POST("/auth/", auth_controller.VerifyUserLogin)
 	router.POST("/auth/verify-token/", jwt_middleware, auth_controller.VerifyToken)
 
@@ -40,7 +43,8 @@ func InitRouter(config *configuration.Configuration) *gin.Engine {
 	apiv1.Use(jwt_middleware)
 
 	// Movie endpoints
-	movie_controller := api.NewMovieController(postgres)
+	movie_service := services.NewMovieService(postgres)
+	movie_controller := api.NewMovieController(movie_service)
 
 	apiv1.POST("/movie/", movie_controller.InsertNewMovie)
 	apiv1.GET("/movie/:id/", movie_controller.GetMovieById)
@@ -50,11 +54,15 @@ func InitRouter(config *configuration.Configuration) *gin.Engine {
 	apiv1.GET("/movies/", movie_controller.GetListAllMovies)
 
 	// Publisher endpoints
-	publisher_controller := api.NewPublisherController(postgres)
+	publisher_service := services.NewPublisherService(postgres)
+	publisher_controller := api.NewPublisherController(publisher_service)
+
 	apiv1.GET("/publishers/name/", publisher_controller.GetListAllPublishersName)
 
 	// Genre endpoints
-	genre_controller := api.NewGenreController(postgres)
+	genre_service := services.NewGenreService(postgres)
+	genre_controller := api.NewGenreController(genre_service)
+
 	apiv1.GET("/genres/", genre_controller.GetAllGenres)
 
 	return router

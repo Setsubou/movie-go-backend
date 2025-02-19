@@ -3,15 +3,20 @@ package api
 import (
 	"backend/errors"
 	"backend/model"
-	"backend/repository"
 	"backend/services"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
+func NewMovieController(movie_service *services.MovieService) *Movie_controller {
+	return &Movie_controller{
+		movie_service: movie_service,
+	}
+}
+
 type Movie_controller struct {
-	repository repository.MovieRepository
+	movie_service *services.MovieService
 }
 
 func (mc *Movie_controller) InsertNewMovie(c *gin.Context) {
@@ -22,7 +27,7 @@ func (mc *Movie_controller) InsertNewMovie(c *gin.Context) {
 		return
 	}
 
-	id, err := services.NewMovieService(mc.repository).InsertNewMovie(movie_data)
+	id, err := mc.movie_service.InsertNewMovie(movie_data)
 
 	if err != nil {
 		if internalErr, ok := err.(*errors.InternalError); ok {
@@ -40,7 +45,7 @@ func (mc *Movie_controller) InsertNewMovie(c *gin.Context) {
 }
 
 func (mc *Movie_controller) GetMovieById(c *gin.Context) {
-	movie, err := services.NewMovieService(mc.repository).GetMovieById(c.Param("id"))
+	movie, err := mc.movie_service.GetMovieById(c.Param("id"))
 
 	if err != nil {
 		if internalErr, ok := err.(*errors.InternalError); ok {
@@ -55,7 +60,7 @@ func (mc *Movie_controller) GetMovieById(c *gin.Context) {
 }
 
 func (mc *Movie_controller) GetListAllMovies(c *gin.Context) {
-	movie, err := services.NewMovieService(mc.repository).GetListAllMovies()
+	movie, err := mc.movie_service.GetListAllMovies()
 
 	if err != nil {
 		if internalErr, ok := err.(*errors.InternalError); ok {
@@ -70,7 +75,7 @@ func (mc *Movie_controller) GetListAllMovies(c *gin.Context) {
 }
 
 func (mc *Movie_controller) DeleteMovieById(c *gin.Context) {
-	err := services.NewMovieService(mc.repository).DeleteMovieById(c.Param("id"))
+	err := mc.movie_service.DeleteMovieById(c.Param("id"))
 
 	if err != nil {
 		if internalErr, ok := err.(*errors.InternalError); ok {
@@ -87,7 +92,7 @@ func (mc *Movie_controller) DeleteMovieById(c *gin.Context) {
 }
 
 func (mc *Movie_controller)GetMoviesByPublisherId(c *gin.Context) {
-	movies, err := services.NewMovieService(mc.repository).GetMoviesByPublisherId(c.Param("id"))
+	movies, err := mc.movie_service.GetMoviesByPublisherId(c.Param("id"))
 
 	if err != nil {
 		if internalErr, ok := err.(*errors.InternalError); ok {
@@ -99,10 +104,4 @@ func (mc *Movie_controller)GetMoviesByPublisherId(c *gin.Context) {
 	}
 	
 	c.JSON(http.StatusOK, movies)
-}
-
-func NewMovieController(repository repository.MovieRepository) *Movie_controller {
-	return &Movie_controller{
-		repository: repository,
-	}
 }
