@@ -7,22 +7,22 @@ import (
 	"github.com/joho/godotenv"
 )
 
-type ApplicationConfiguration struct{
-	port string
-	host string
+type ApplicationConfiguration struct {
+	port         string
+	host         string
 	Release_mode string
-	Secret string
+	Secret       string
 }
 
 func (a *ApplicationConfiguration) GetApplicationConnectionString() string {
 	return fmt.Sprintf("%s:%s", a.host, a.port)
 }
 
-type DatabaseConfiguration struct{
-	username string
-	password string
-	port string
-	host string
+type DatabaseConfiguration struct {
+	username      string
+	password      string
+	port          string
+	host          string
 	database_name string
 	database_mode string
 }
@@ -52,12 +52,12 @@ func InitConfiguration() *Configuration {
 
 	return &Configuration{
 		ApplicationConfiguration: ApplicationConfiguration{
-			port: config["APP_PORT"],
-			host: config["APP_HOST"],
+			port:         config["APP_PORT"],
+			host:         config["APP_HOST"],
 			Release_mode: config["RELEASE_MODE"],
-			Secret: config["JWT_SECRET_KEY"],
+			Secret:       config["JWT_SECRET_KEY"],
 		},
-		DatabaseConfiguration:    DatabaseConfiguration{
+		DatabaseConfiguration: DatabaseConfiguration{
 			username:      config["DB_USERNAME"],
 			password:      config["DB_PASSWORD"],
 			port:          config["DB_PORT"],

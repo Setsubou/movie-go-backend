@@ -123,7 +123,7 @@ func (s *MovieService) InsertNewMovie(movie_data model.Movie) (string, error) {
 	}
 
 	movie_param := db.InsertNewMovieParams{
-		ID: movie_uuid,
+		ID:          movie_uuid,
 		Title:       movie_data.Title,
 		Score:       score,
 		Picture:     movie_data.Picture,

@@ -39,7 +39,7 @@ func (mc *Movie_controller) InsertNewMovie(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, gin.H{
-		"message": "resource created",
+		"message":     "resource created",
 		"resource_id": id,
 	})
 }
@@ -91,7 +91,7 @@ func (mc *Movie_controller) DeleteMovieById(c *gin.Context) {
 	})
 }
 
-func (mc *Movie_controller)GetMoviesByPublisherId(c *gin.Context) {
+func (mc *Movie_controller) GetMoviesByPublisherId(c *gin.Context) {
 	movies, err := mc.movie_service.GetMoviesByPublisherId(c.Param("id"))
 
 	if err != nil {
@@ -102,6 +102,6 @@ func (mc *Movie_controller)GetMoviesByPublisherId(c *gin.Context) {
 		}
 		return
 	}
-	
+
 	c.JSON(http.StatusOK, movies)
 }

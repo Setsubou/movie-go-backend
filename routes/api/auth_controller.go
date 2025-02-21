@@ -12,13 +12,13 @@ import (
 func NewAuthController(auth_service *services.AuthService, secret string) *Auth_controller {
 	return &Auth_controller{
 		auth_service: auth_service,
-		secret:  secret,
+		secret:       secret,
 	}
 }
 
 type Auth_controller struct {
 	auth_service *services.AuthService
-	secret  string
+	secret       string
 }
 
 func (ac *Auth_controller) VerifyUserLogin(c *gin.Context) {
@@ -59,7 +59,7 @@ func (ac *Auth_controller) VerifyToken(c *gin.Context) {
 func (ac *Auth_controller) Logout(c *gin.Context) {
 	c.SetCookie("access_token", "", -1, "/", "localhost", false, true)
 
-	c.JSON(http.StatusOK, gin.H {
+	c.JSON(http.StatusOK, gin.H{
 		"message": "logged out successfully",
 	})
 }
