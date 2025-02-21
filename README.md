@@ -22,7 +22,7 @@ Type `go run main.go` to start Gin.
 # Authenticating
 Peform a **POST** request to `/auth/` with username and password as JSON body. By default, it comes with dummy account as part of database migration. We can use `admin` both as its username and password.
 
-If successful, JWT Token will stored as cookies with expiry date of one hour from token generation.
+If successful, JWT Token will stored in cookies with expiry date of one hour from token generation.
 
 # Available API
 `GET /health-check/` -> used to ping the server. Token is not required to perform this check.
