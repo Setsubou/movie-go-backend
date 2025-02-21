@@ -40,9 +40,11 @@ func (ac *Auth_controller) VerifyUserLogin(c *gin.Context) {
 		return
 	}
 
-	c.SetSameSite(http.SameSiteLaxMode)
+	c.SetCookie("access_token", token, 3600, "/", "localhost", false, true)
+	c.SetSameSite(http.SameSiteNoneMode)
+
 	c.JSON(http.StatusOK, gin.H{
-		"access token": token,
+		"message": "success",
 	})
 }
 
@@ -51,5 +53,13 @@ func (ac *Auth_controller) VerifyToken(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "token is still valid",
+	})
+}
+
+func (ac *Auth_controller) Logout(c *gin.Context) {
+	c.SetCookie("access_token", "", -1, "/", "localhost", false, true)
+
+	c.JSON(http.StatusOK, gin.H {
+		"message": "logged out successfully",
 	})
 }

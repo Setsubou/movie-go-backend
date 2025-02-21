@@ -18,7 +18,7 @@ func InitRouter(config *configuration.Configuration) *gin.Engine {
 	router.Use(cors.New(cors.Config{
 		AllowAllOrigins:  true,
 		AllowMethods:     []string{"PUT", "GET", "POST", "OPTIONS"},
-		AllowHeaders:     []string{"Content-Type", "Content-Length", "Accept-Encoding", "X-CSRF-Token", "Authorization", "accept", "origin"},
+		AllowHeaders:     []string{"Content-Type", "Content-Length", "Accept-Encoding", "X-CSRF-Token", "Authorization", "accept", "Origin"},
 		AllowCredentials: true,
 	}))
 
@@ -38,6 +38,7 @@ func InitRouter(config *configuration.Configuration) *gin.Engine {
 
 	router.POST("/auth/", auth_controller.VerifyUserLogin)
 	router.POST("/auth/verify-token/", jwt_middleware, auth_controller.VerifyToken)
+	router.POST("/auth/logout/", auth_controller.Logout)
 
 	apiv1 := router.Group("/api/v1/")
 	apiv1.Use(jwt_middleware)
