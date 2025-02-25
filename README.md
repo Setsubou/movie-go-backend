@@ -26,8 +26,8 @@ Peform a **POST** request to `/auth/` with username and password as JSON. By def
 
 ```javascript
 {
-    "username": " admin",
-    "pasword": "admin"
+    "username": "admin",
+    "password": "admin"
 }
 ```
 
