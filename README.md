@@ -14,13 +14,20 @@ Once that is done change terminal directory to `/db/migrations` and type `tern m
 If successful, our database should be populated by tables and dummy datas.
 
 # Environment variable
-Make a copy of `.env.example`, rename it to `.env` and populate it with database configuration and our own app configuration, along with Secret key used for generating JWT Token.
+Make a copy of `.env.example`, rename it to `.env` and populate it with database configuration and our own app configuration, Allowed URL used for CORS, and along with Secret key used for generating JWT Token.
 
 # Running the app
 Type `go run main.go` to start Gin.
 
 # Authenticating
-Peform a **POST** request to `/auth/` with username and password as JSON body. By default, it comes with dummy account as part of database migration. We can use `admin` both as its username and password.
+Peform a **POST** request to `/auth/` with username and password as JSON. By default, it comes with dummy account as part of database migration. We can use `admin` both as its username and password.
+
+```javascript
+{
+    "username": " admin",
+    "pasword": "admin"
+}
+```
 
 If successful, JWT Token will stored in cookies with expiry date of one hour from token generation.
 
