@@ -3,6 +3,7 @@ package configuration
 import (
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/joho/godotenv"
 )
@@ -12,6 +13,7 @@ type ApplicationConfiguration struct {
 	host         string
 	Release_mode string
 	Secret       string
+	Allowed_origins []string
 }
 
 func (a *ApplicationConfiguration) GetApplicationConnectionString() string {
@@ -50,12 +52,23 @@ func InitConfiguration() *Configuration {
 		log.Fatal("Missing .env")
 	}
 
+	allowedOriginsRaw := config["ALLOWED_ORIGINS"]
+	allowedOrigins := []string{}
+
+	for _, origin := range strings.Split(allowedOriginsRaw, ",") {
+		trimmed := strings.TrimSpace(origin)
+		if trimmed != "" {
+			allowedOrigins = append(allowedOrigins, trimmed)
+		}
+	}
+	
 	return &Configuration{
 		ApplicationConfiguration: ApplicationConfiguration{
 			port:         config["APP_PORT"],
 			host:         config["APP_HOST"],
 			Release_mode: config["RELEASE_MODE"],
 			Secret:       config["JWT_SECRET_KEY"],
+			Allowed_origins: allowedOrigins,
 		},
 		DatabaseConfiguration: DatabaseConfiguration{
 			username:      config["DB_USERNAME"],

@@ -16,7 +16,7 @@ func InitRouter(config *configuration.Configuration) *gin.Engine {
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
 	router.Use(cors.New(cors.Config{
-		AllowAllOrigins:  true,
+		AllowOrigins:  config.ApplicationConfiguration.Allowed_origins,
 		AllowMethods:     []string{"PUT", "GET", "POST", "OPTIONS"},
 		AllowHeaders:     []string{"Content-Type", "Content-Length", "Accept-Encoding", "X-CSRF-Token", "Authorization", "accept", "Origin"},
 		AllowCredentials: true,
