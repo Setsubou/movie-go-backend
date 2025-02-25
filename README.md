@@ -1,3 +1,5 @@
+This project is made in conjunction with its [Frontend Counterpart](https://github.com/Setsubou/movie-nextjs-frontend)
+
 # Prerequisites
 Before going any further, make sure that you have Postgresql running. Take a note of its:
 - Hostname
